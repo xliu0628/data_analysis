@@ -25,4 +25,7 @@
 
 ### calculation of ocean heat transport using ocean data
 
-### a
+### interpolation
+        varO[ilat,Paclatlons_new[ilat]] = np.interp(lons_expand,lons_expand_small,
+                                                               varI[ilat,lons_normal])
+                                                                                                                      
