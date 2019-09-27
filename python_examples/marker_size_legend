@@ -1,0 +1,32 @@
+specID = [202,15,805,20]
+fig, axes = plt.subplots(nrows=2, ncols=2,figsize=(14,6.5))
+axes = axes.ravel()
+fig.subplots_adjust(hspace = .3, wspace=.2)
+
+for ii in range(4):
+    test = dfCA[dfCA['SPCD']==specID[ii]]
+    test_plot = test.groupby(['INVYR'])
+    treeDrought=test.loc[(test['INVYR']>2000) & (test['INVYR']<2006)]  ### years selected: 2012-2016; You can specify the range of years
+    treeDrought_sort = treeDrought.groupby(['STATUSCD'])
+    treeDrought_dead = treeDrought_sort.get_group(2)  ## Select only the dead trees
+    tree_nofire = treeDrought_dead.drop(treeDrought_dead[treeDrought_dead.AGENTCD == 30].index) ## select only the non-fir
+    
+    bin_all = np.histogram(treeDrought['DIA'].values,bins=np.arange(0,60,5))
+    bin_dead = np.histogram(tree_nofire['DIA'].values,bins=np.arange(0,60,5))
+
+    frac = bin_dead[0]/bin_all[0]
+    
+    axes[ii].scatter(bin_all[1][:-1]+2.5,frac,s=bin_all[0]**2/5e3) ## Note, parameter s is the area of marker size
+    axes[ii].set_xlim([0,55])
+    axes[ii].set_ylim([-0.05,0.35])
+    axes[ii].set_xlabel('DIA [m]')
+    axes[ii].set_ylabel('mortality rate')
+    axes[ii].text(2,0.3,treeID[specID[ii]],fontsize=15)
+    
+    if ii==0:
+        axes[ii].scatter(bin_all[1][0]+2.5,frac[0],bin_all[0][0]**2/5e3, color='blue',label='500 trees')
+        scale = (500/bin_all[0][0]) ## note, scale the marker size according to the ratio between the point plotted and 500 trees.
+        print(scale)
+        axes[ii].legend(markerscale=scale,loc='upper right')
+        print(bin_all[0])
+    
